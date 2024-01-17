@@ -7,36 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
+  
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.414'
-      - name: Install Leptonica and Tesseract
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libleptonica-dev
-          sudo apt-get install -y tesseract-ocr
-          
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Run tests
-        run: dotnet test --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish ./src/Marion.Dalifard.Ocr.Console/Marion.Dalifard.Ocr.Console.csproj -c Release -r win-x64 --self-contained true -o ./publish --no-restore /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
-
-      - name: Upload artifact
+          dotnet-version: 6.0.414
+      - run: dotnet test
+      - run: dotnet publish ./src/Marion.Dalifard.Ocr.Console/Marion.Dalifard.Ocr.Console.csproj --self-contained true --output ./win-x64/ocr -c Release -r win-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
+      - name: Upload WebApp1 Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: win-x64-ocr-exe
-          path: ./publish/ocr.exe
+          name: Publish win-x64 Ocr
+          path: ./win-x64/ocr.exe
+    
