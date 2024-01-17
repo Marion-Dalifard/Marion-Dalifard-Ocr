@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -18,15 +18,8 @@ jobs:
         with:
           dotnet-version: '6.0.414'
 
-      - name: Install Leptonica and Tesseract
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libleptonica-dev tesseract-ocr libtesseract-dev
-
-      - name: Verify Tesseract and Leptonica Installation
-        run: |
-          tesseract --version
-          ldconfig -p | grep libleptonica
+      - name: Install Tesseract
+        run: choco install tesseract
 
       - name: Restore dependencies
         run: dotnet restore
