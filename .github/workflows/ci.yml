@@ -1,41 +1,37 @@
-name: Test & Build
+name: .NET Core CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.414
+          dotnet-version: '6.0.414'
 
-      - name: Install Leptonica
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libleptonica-dev
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Build and Test
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet test --configuration Release --no-restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
 
-      - name: Publish Console App
-        if: success()
-        run: |
-          dotnet publish ./src/Marion.Dalifard.Ocr.Console/Marion.Dalifard.Ocr.Console.csproj -c Release -r win-x64 --self-contained true -o publish --no-restore /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
+      - name: Run tests
+        run: dotnet test --configuration Release --no-restore
 
-      - name: Upload Build Artifact
+      - name: Publish
+        run: dotnet publish ./src/Marion.Dalifard.Ocr.Console/Marion.Dalifard.Ocr.Console.csproj -c Release -r win-x64 --self-contained true -o ./publish --no-restore /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name:  Publish win-x64 ocr
-          path: ./win-x64/ocr.exe
+          name: win-x64-ocr-exe
+          path: ./publish/ocr.exe
