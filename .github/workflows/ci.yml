@@ -1,0 +1,36 @@
+name: Test & Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.414
+
+      - name: Build and Test
+        run: |
+          dotnet restore
+          dotnet build --configuration Release
+          dotnet test --configuration Release --no-restore
+
+      - name: Publish Console App
+        if: success()
+        run: |
+          dotnet publish ./src/Marion.Dalifard.Ocr.Console/Marion.Dalifard.Ocr.Console.csproj -c Release -r win-x64 --self-contained true -o publish --no-restore /p:PublishSingleFile=true /p:PublishTrimmed=true /p:PublishReadyToRun=true
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name:  Publish win-x64 ocr
+          path: ./win-x64/ocr.exe
