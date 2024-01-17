@@ -11,7 +11,7 @@ public class OcrUnitTest
         var executingPath = GetExecutingPath();
         var images = new List<byte[]>();
         foreach (var imagePath in
-                 Directory.EnumerateFiles(Path.Combine(executingPath, "images")))
+                 Directory.EnumerateFiles(Path.Combine(executingPath, "Images")))
         {
             var imageBytes = await File.ReadAllBytesAsync(imagePath);
             images.Add(imageBytes);
